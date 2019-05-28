@@ -57,7 +57,6 @@
                       <div class="form-group">
                           <label for="txtCustomerAddress">Customer Address</label>
                           <input type="text" class="form-control" id="txtCustomerAddress" placeholder="Enter Customer Address">
-                          <span class="error" id="invalid_email">Email-id is invalid</span>
                       </div>
 
                     </div>
@@ -111,66 +110,72 @@
 </div>
 <!-- ./wrapper -->
 
-
+<!-- jQuery 3 -->
+<script src="bower_components/jquery/dist/jquery.min.js"></script>
+<!-- jQuery UI 1.11.4 -->
+<script src="bower_components/jquery-ui/jquery-ui.min.js"></script>
+<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
 <!-- -->
+
 
 <script>
     var SERVER_URL = "http://localhost:8010";
 
-    var id = $("#txtCustomerId").val();
-    var name = $("#txtCustomerName").val();
-    var address = $("#txtCustomerAddress").val();
-    if(id == '') {
-        $('#id').next().show();
-    }if(name== '') {
-        $('#name').next().show();
-    }if(address == '') {
-        $('#address').next().show();
-    }if(IsEmail(address)==false){
-        alert("Please Enter email correctly");
-    }
+
+
     $("#btnSave").click(function(){
-        console.log(id+" "+name+" "+address);
-        if ($("#txtCustomerId").attr("disabled")){
-            var customer = {
-                id: $("#txtCustomerId").val(),
-                name: $("#txtCustomerName").val(),
-                address: $("#txtCustomerAddress").val(),
-            };
-            var ajaxConfig = {
-                method: "PUT",
-                contentType: "application/json",
-                data: JSON.stringify(customer)
+        var id = $("#txtCustomerId").val();
+        var name = $("#txtCustomerName").val();
+        var address = $("#txtCustomerAddress").val();
+        if(id == '' && name == ''){
+            alert("Please Enter values :");
+        }else if(IsEmail(address)==false){
+            alert("Please Enter email correctly");
+        }else {
+            console.log(id + " " + name + " " + address);
+            if ($("#txtCustomerId").attr("disabled")) {
+                var customer = {
+                    id: $("#txtCustomerId").val(),
+                    name: $("#txtCustomerName").val(),
+                    address: $("#txtCustomerAddress").val(),
+                };
+                var ajaxConfig = {
+                    method: "PUT",
+                    url: SERVER_URL + "/api/v1/customers/" + $("#txtCustomerId").val(),
+                    async: true,
+                    contentType: "application/json",
+                    data: JSON.stringify(customer)
+                }
+                $.ajax(ajaxConfig).done(function (response, statusText, jxhr) {
+                    alert("Updated Successfully");
+                    loadAllCustomers();
+                    $('button[type="reset"]').trigger("click");
+                }).fail(function (jxhr, statusText, error) {
+                    alert("Unable to update the customer, try again");
+                    console.log(error);
+                });
+            } else {
+                var customer = {
+                    id: $("#txtCustomerId").val(),
+                    name: $("#txtCustomerName").val(),
+                    address: $("#txtCustomerAddress").val(),
+                };
+                var ajaxConfig = {
+                    method: "POST",
+                    url: SERVER_URL + "/api/v1/customers",
+                    async: true,
+                    contentType: "application/json",
+                    data: JSON.stringify(customer)
+                }
+                $.ajax(ajaxConfig).done(function (response, statusText, jxhr) {
+                    alert("Added Successfully");
+                    loadAllCustomers();
+                    $('button[type="reset"]').trigger("click");
+                }).fail(function (jxhr, statusText, error) {
+                    alert("Unable to save the customer, try again");
+                    console.log(error);
+                });
             }
-            $.ajax(ajaxConfig).done(function(response,statusText,jxhr){
-                alert("Updated Successfully");
-                loadAllCustomers();
-                $('button[type="reset"]').trigger("click");
-            }).fail(function(jxhr,statusText,error){
-                alert("Unable to update the customer, try again");
-                console.log(error);
-            });
-        }else{
-            var customer = {
-                id: $("#txtCustomerId").val(),
-                name: $("#txtCustomerName").val(),
-                address: $("#txtCustomerAddress").val(),
-            };
-            var ajaxConfig = {
-                method: "POST",
-                url: SERVER_URL + "/api/v1/customers/",
-                async: true,
-                contentType: "application/json",
-                data: JSON.stringify(customer)
-            }
-            $.ajax(ajaxConfig).done(function(response,statusText,jxhr){
-                alert("Added Successfully");
-                loadAllCustomers();
-                $('button[type="reset"]').trigger("click");
-            }).fail(function(jxhr,statusText,error){
-                alert("Unable to save the customer, try again");
-                console.log(error);
-            });
         }
     });
 
